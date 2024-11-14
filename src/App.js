@@ -1,22 +1,61 @@
 import logo from './logo.svg';
 import './App.css';
+import React, { useMemo, useState, useEffect } from 'react';
+import { debounce } from 'lodash'
 
 function App() {
+  let [trCount, setTRCount] = useState(0);
+  let [tdCount, setTDCount] = useState(0);
+  console.log("==render===", trCount, tdCount);
+
+  let generateTableData = (rows,columns) => {
+    console.log("==generateTableData===", rows,columns);
+    let trs = [];
+    let tds = [];
+    if(rows > 0 && columns > 0){
+      for(var i=0;i < rows;i++){
+        tds = [];
+        for(var j=0;j < columns;j++){
+          tds.push([i,j]);
+        }
+        trs.push(tds);
+      }
+    }
+    return trs;
+  }
+
+  let data = useMemo(()=>{
+    return generateTableData(trCount, tdCount);
+  }, [trCount, tdCount])
+
   return (
     <div className="App">
       <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
         <p>
-          Edit <code>src/App.js</code> and save to reload.
+          <input type="text" onChange={(e)=>{
+            let v = parseInt(e.currentTarget.value);
+            setTRCount(v);
+          }}/>
+          <input type="text" onChange={(e)=>{
+            let v = parseInt(e.currentTarget.value);
+            setTDCount(v);
+          }}/>
         </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
+        <table>
+          <tbody>
+            {data.length ? (
+              data.map((row, i)=>{
+                return <tr key={i}>
+                  {row.map((column, j)=>{
+                    return <td key={`${i}-${j}`}>r{column[0]}, c{column[1]}</td>
+                  })}
+                </tr>
+              })
+            ) : "请输入行数和列数3"
+            }
+          </tbody>
+        </table>
+        
       </header>
     </div>
   );
