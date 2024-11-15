@@ -1,6 +1,6 @@
 import logo from './logo.svg';
 import './App.css';
-import React, { useMemo, useState, useEffect } from 'react';
+import React, { useMemo, useState, useEffect, useCallback } from 'react';
 import { debounce } from 'lodash'
 
 function App() {
@@ -26,20 +26,39 @@ function App() {
 
   let data = useMemo(()=>{
     return generateTableData(trCount, tdCount);
-  }, [trCount, tdCount])
+  }, [trCount, tdCount]);
+
+  // 创建防抖处理函数
+  const debouncedSetTRCount = useCallback(debounce((value) => {
+    setTRCount(value);
+  }, 300), []);
+
+  const debouncedSetTDCount = useCallback(debounce((value) => {
+    setTDCount(value);
+  }, 300), []);
 
   return (
     <div className="App">
       <header className="App-header">
         <p>
-          <input type="text" onChange={(e)=>{
-            let v = parseInt(e.currentTarget.value);
-            setTRCount(v);
-          }}/>
-          <input type="text" onChange={(e)=>{
-            let v = parseInt(e.currentTarget.value);
-            setTDCount(v);
-          }}/>
+          <input
+            type="text"
+            onChange={(e) => {
+              let v = parseInt(e.currentTarget.value);
+              if (!isNaN(v)) {
+                debouncedSetTRCount(v);
+              }
+            }}
+          />
+          <input
+            type="text"
+            onChange={(e) => {
+              let v = parseInt(e.currentTarget.value);
+              if (!isNaN(v)) {
+                debouncedSetTDCount(v);
+              }
+            }}
+          />
         </p>
         <table>
           <tbody>
@@ -51,7 +70,7 @@ function App() {
                   })}
                 </tr>
               })
-            ) : "请输入行数和列数3"
+            ) : <tr><td>请输入行数和列数</td></tr>
             }
           </tbody>
         </table>
