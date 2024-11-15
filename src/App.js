@@ -10,6 +10,7 @@ function App() {
 
   const generateTableData = (rows, columns) => {
     console.log("==generateTableData===", rows, columns);
+    if (rows <= 0 || columns <= 0) return [];
     const trs = [];
     if (rows > 0 && columns > 0) {
       for (let i = 0; i < rows; i++) {
@@ -33,6 +34,14 @@ function App() {
   const debouncedSetTDCount = useCallback(debounce((value) => {
     setTDCount(value);
   }, 300), []);
+
+  // 清理防抖函数
+  useEffect(() => {
+    return () => {
+      debouncedSetTRCount.cancel();
+      debouncedSetTDCount.cancel();
+    };
+  }, [debouncedSetTRCount, debouncedSetTDCount]);
 
   // 输入处理逻辑
   const handleTRChange = (e) => {
